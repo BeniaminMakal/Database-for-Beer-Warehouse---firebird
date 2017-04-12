@@ -1,57 +1,53 @@
+-- Create or connect to database
 
-/* Script to create database*/
+CREATE DATABASE "E:\SQL\Test\Database_for_Beer_Warehouse.fdb" page_size 8192
+user 'sysdba' password 'masterkey'
 
-USE [master]
-GO
+CONNECT "E:\SQL\Test\Test.fdb"
+user 'sysdba' password 'masterkey'
 
-CREATE DATABASE [Warehouse]
-GO
-USE [Warehouse]
-GO
 
-CREATE TABLE [dbo].[Sale] (
-Sale_ID int identity(1,1) NOT NULL,
+
+-- Creating tables 
+
+CREATE TABLE Sale (
+Sale_ID int NOT NULL PRIMARY KEY,
 Employee_ID int NOT NULL,
 Customer_name varchar(255) NOT NULL,
 Invoice_ID int NOT NULL,
-Sale_date datetime,
-Operation_status int CHECK (Operation_status = 0 OR Operation_status = 1) DEFAULT (0),
-CONSTRAINT PK_Sale PRIMARY KEY CLUSTERED (Sale_ID) 
-)
-GO
+Sale_date date)
 
-CREATE TABLE [dbo].[Invoice_headers] (
-Invoice_ID int identity(1,1) NOT NULL,
+
+
+CREATE TABLE Invoice_headers (
+Invoice_ID int NOT NULL PRIMARY KEY,
 Customer_ID int NOT NULL,
 Payment varchar(30) NOT NULL,
 Discount int,
-Date_time datetime,
-Invoice_value float NOT NULL
-CONSTRAINT PK_Invoice_header PRIMARY KEY CLUSTERED (Invoice_ID))
-GO
+Invoice_datetime timestamp,
+Invoice_value float NOT NULL)
 
-CREATE TABLE [dbo].[Invoice_items] (
-ID int NOT NULL identity(1,1),
+
+CREATE TABLE Invoice_items (
+ID int NOT NULL PRIMARY KEY,
 Invoice_ID int NOT NULL,
 Product_name varchar(255) NOT NULL,
 Unit_price int NOT NULL CHECK (Unit_price>0),
 Amount float NOT NULL,
 Unit_of_measurement varchar(50) NOT NULL,
-Serial_number varchar(255) NOT NULL, 
-CONSTRAINT PK_Invoice_items PRIMARY KEY CLUSTERED (ID))
-GO
+Serial_number varchar(255) NOT NULL)
 
-CREATE TABLE [dbo].[Employees] (
-Employee_ID int identity(1,1) NOT NULL, 
+
+CREATE TABLE Employees (
+Employee_ID int NOT NULL PRIMARY KEY, 
 Em_LOGIN varchar (50) NOT NULL,
-Position varchar(255) NOT NULL,
+Job_title varchar(255) NOT NULL,
 Em_Name varchar(255) NOT NULL,
-Surname varchar(255) NOT NULL
-CONSTRAINT PK_Employee PRIMARY KEY CLUSTERED (Employee_ID))
-GO
+Surname varchar(255) NOT NULL)
 
-CREATE TABLE [dbo].[Customers] (
-Customer_ID int identity(1,1) NOT NULL,
+
+CREATE TABLE Customers (
+Customer_ID int NOT NULL PRIMARY KEY,
 Customer_name varchar(255) UNIQUE,
 NIP varchar(20) UNIQUE,
 City varchar(255),
@@ -60,66 +56,75 @@ Postal_code varchar(50),
 Telephone varchar(50),
 Email varchar(255),
 WWW varchar(255),
-Cus_Type varchar(50),
-CONSTRAINT PK_Customers PRIMARY KEY CLUSTERED (Customer_ID))
-GO
+Cus_Type varchar(50))
 
-CREATE TABLE [dbo].[Cus_Types] (
+
+CREATE TABLE Cus_Types (
 Cus_Type varchar(50) NOT NULL, 
-Discount int CHECK (Discount >= 0) DEFAULT (0)
-CONSTRAINT PK_Cus_Type PRIMARY KEY CLUSTERED (Cus_Type))
-GO
+Discount int DEFAULT 0 CHECK (Discount >= 0))
 
-CREATE TABLE [dbo].[Products] (
-ID int identity(1,1) NOT NULL,
+CREATE TABLE Products (
+ID int NOT NULL PRIMARY KEY,
 Product_name varchar(255) NOT NULL UNIQUE,
 Brewery varchar(255) NOT NULL, 
 Distributor varchar(255),
 Price int NOT NULL,
 P_type varchar(50) NOT NULL,
 Amount int CHECK (Amount>=0),
-Unit_of_measurement varchar(50) NOT NULL,
-CONSTRAINT PK_Product PRIMARY KEY CLUSTERED (ID))
-GO
+Unit_of_measurement varchar(50) NOT NULL)
+
 
 CREATE TABLE [dbo].[Products_Types] (
-ID int identity (1,1) NOT NULL,
-P_Type_Name varchar(50) NOT NULL UNIQUE,
-CONSTRAINT PK_Product_Type PRIMARY KEY CLUSTERED (ID))
-GO
+ID int NOT NULL PRIMARY KEY,
+P_Type_Name varchar(50) NOT NULL UNIQUE)
 
-CREATE TABLE [dbo].[Expiration_dates](
-ID int identity (1,1) NOT NULL,
+
+CREATE TABLE Expiration_dates(
+ID int NOT NULL PRIMARY KEY,
 Product_name varchar(255) NOT NULL,
 Serial_number varchar(255) NOT NULL,
-Expiration_date datetime NOT NULL,
-CONSTRAINT PK_Expiration_dates PRIMARY KEY CLUSTERED (ID)
-)
-GO
+Expiration_date datetime NOT NULL)
 
-CREATE TABLE [dbo].[Distributors] (
-ID int identity(1,1) NOT NULL,
+
+CREATE TABLE Distributors (
+ID int NOT NULL PRIMARY KEY,
 Dis_name varchar(255) NOT NULL UNIQUE,
 Dis_Location varchar(255) NOT NULL,
 Adress varchar (255) NOT NULL,
 Postal_code varchar(50) NOT NULL,
 Telephone varchar (50) NOT NULL,
 Email varchar(255) NOT NULL,
-WWW varchar(255) NOT NULL
-CONSTRAINT PK_Distributor PRIMARY KEY CLUSTERED (ID))
-GO
+WWW varchar(255) NOT NULL)
 
-CREATE TABLE [dbo].[Breweries] (
-ID int identity(1,1) NOT NULL,
+
+CREATE TABLE Breweries (
+ID int NOT NULL PRIMARY KEY,
 Br_name varchar(255) NOT NULL UNIQUE,
 Br_Location varchar(255) NOT NULL,
 Adress varchar (255) NOT NULL,
 Postal_code varchar(50) NOT NULL,
 Telephone varchar(50) NOT NULL,
 Email varchar(255) NOT NULL,
-WWW varchar(255) NOT NULL
-CONSTRAINT PK_Brewerys PRIMARY KEY CLUSTERED (ID))
-GO
+WWW varchar(255) NOT NULL)
+
+-- Creating generators
+
+CREATE GENERATOR gen_sale_id;
+SET GENERATOR gen_sale_id TO 0;
+
+-- Creating triggers
+
+SET TERM !!;
+
+CREATE TRIGGER TR_Sale_ID FOR Sale
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Sale_ID IS NULL) THEN NEW.Sale_ID = GEN_ID(gen_sale_id, 1);
+END
+
+
+SET TERM ;!!
 
 /* This part is adding foreign keys */
 
@@ -179,33 +184,6 @@ GO
 ALTER TABLE [dbo].[Customers]  WITH NOCHECK ADD  CONSTRAINT [FK_Customers] FOREIGN KEY([Cus_Type])
 REFERENCES [dbo].[Cus_Types] ([Cus_Type])
 ON DELETE CASCADE
-GO
-
-/*TRIGGERS*/
-
-CREATE TRIGGER TR_GET_DATETIME_SALE ON Sale
-AFTER INSERT
-AS
-UPDATE Sale
-SET Sale_date = GETDATE()
-WHERE Sale_ID = (SELECT MAX(Sale_ID) FROM Sale);
-GO
-
-CREATE TRIGGER TR_GET_DATETIME_INVOICE_H ON Sale
-AFTER INSERT
-AS
-UPDATE Invoice_headers
-SET Date_time = GETDATE()
-WHERE Invoice_ID = (SELECT MAX(Invoice_ID) FROM Invoice_headers);
-GO
-
-
-CREATE TRIGGER TR_SET_OPERATION_STATUS ON Sale
-AFTER INSERT
-AS
-UPDATE Sale
-SET Operation_Status = 1
-WHERE Sale_ID = (SELECT MAX(Sale_ID) FROM Sale);
 GO
 
 
@@ -510,11 +488,13 @@ INSERT INTO Invoice_items (Product_name, Invoice_ID, Amount, Unit_price, Unit_of
 VALUES ('Hip-Hops', 3, 1000, 10, '0.5l', '2017/01/23/G543')
 
 INSERT INTO SALE (Employee_ID, Customer_name, Invoice_ID, Sale_date)
-VALUES (1, 'GRAF', 1, '2017-02-23 11:11:21')
+VALUES (1, 'GRAF', 1, '2017-02-23')
 
 INSERT INTO SALE (Employee_ID, Customer_name, Invoice_ID, Sale_date)
-VALUES (2, 'Semafor', 2, '2017-01-01 16:00:22')
+VALUES (2, 'Semafor', 2, '2017-01-01');
 
 INSERT INTO SALE (Employee_ID, Customer_name, Invoice_ID, Sale_date)
-VALUES (3, 'Ma³pka', 3, '2017-01-13 07:57:04')
+VALUES (3, 'Ma³pka', 3, '2017-01-13');
 
+
+COMMIT;

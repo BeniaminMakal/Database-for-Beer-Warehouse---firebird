@@ -1,0 +1,12 @@
+Ideas:
+
+- use embeded version of firebird in application for warehouse of beer
+
+working trigger:
+
+create trigger [trigger_name] for [table_name]
+active before insert position 0
+as
+begin
+if (NEW.ID is NULL) then NEW.ID = GEN_ID([name_of_generator), 1);
+end
