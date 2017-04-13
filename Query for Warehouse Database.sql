@@ -3,7 +3,7 @@
 CREATE DATABASE "E:\SQL\Test\Database_for_Beer_Warehouse.fdb" page_size 8192
 user 'sysdba' password 'masterkey'
 
-CONNECT "E:\SQL\Test\Test.fdb"
+CONNECT "E:\SQL\Test\Database_for_Beer_Warehouse.fdb"
 user 'sysdba' password 'masterkey'
 
 
@@ -17,7 +17,8 @@ Customer_name varchar(255) NOT NULL,
 Invoice_ID int NOT NULL,
 Sale_date date)
 
-
+CREATE GENERATOR gen_invoice_headers_ID;
+SET GENERATOR gen_invoice_headers_ID TO 0;
 
 CREATE TABLE Invoice_headers (
 Invoice_ID int NOT NULL PRIMARY KEY,
@@ -27,6 +28,8 @@ Discount int,
 Invoice_datetime timestamp,
 Invoice_value float NOT NULL)
 
+CREATE GENERATOR gen_invoice_items_ID;
+SET GENERATOR gen_invoice_items_ID TO 0;
 
 CREATE TABLE Invoice_items (
 ID int NOT NULL PRIMARY KEY,
@@ -37,6 +40,8 @@ Amount float NOT NULL,
 Unit_of_measurement varchar(50) NOT NULL,
 Serial_number varchar(255) NOT NULL)
 
+CREATE GENERATOR gen_employyes_ID;
+SET GENERATOR gen_employyes_ID TO 0;
 
 CREATE TABLE Employees (
 Employee_ID int NOT NULL PRIMARY KEY, 
@@ -45,6 +50,8 @@ Job_title varchar(255) NOT NULL,
 Em_Name varchar(255) NOT NULL,
 Surname varchar(255) NOT NULL)
 
+CREATE GENERATOR gen_customers_ID;
+SET gen_customers_ID TO 0;
 
 CREATE TABLE Customers (
 Customer_ID int NOT NULL PRIMARY KEY,
@@ -63,6 +70,8 @@ CREATE TABLE Cus_Types (
 Cus_Type varchar(50) NOT NULL, 
 Discount int DEFAULT 0 CHECK (Discount >= 0))
 
+-- delete ID column from Products table. Set pirmary key to Product_name
+
 CREATE TABLE Products (
 ID int NOT NULL PRIMARY KEY,
 Product_name varchar(255) NOT NULL UNIQUE,
@@ -74,7 +83,7 @@ Amount int CHECK (Amount>=0),
 Unit_of_measurement varchar(50) NOT NULL)
 
 
-CREATE TABLE [dbo].[Products_Types] (
+CREATE TABLE Products_Types (
 ID int NOT NULL PRIMARY KEY,
 P_Type_Name varchar(50) NOT NULL UNIQUE)
 
@@ -83,7 +92,7 @@ CREATE TABLE Expiration_dates(
 ID int NOT NULL PRIMARY KEY,
 Product_name varchar(255) NOT NULL,
 Serial_number varchar(255) NOT NULL,
-Expiration_date datetime NOT NULL)
+Expiration_date timestamp NOT NULL)
 
 
 CREATE TABLE Distributors (
