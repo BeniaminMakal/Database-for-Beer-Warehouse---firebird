@@ -15,10 +15,8 @@ Sale_ID int NOT NULL PRIMARY KEY,
 Employee_ID int NOT NULL,
 Customer_name varchar(255) NOT NULL,
 Invoice_ID int NOT NULL,
-Sale_date date)
+Sale_date date);
 
-CREATE GENERATOR gen_invoice_headers_ID;
-SET GENERATOR gen_invoice_headers_ID TO 0;
 
 CREATE TABLE Invoice_headers (
 Invoice_ID int NOT NULL PRIMARY KEY,
@@ -26,32 +24,29 @@ Customer_ID int NOT NULL,
 Payment varchar(30) NOT NULL,
 Discount int,
 Invoice_datetime timestamp,
-Invoice_value float NOT NULL)
+Invoice_value float NOT NULL);
 
-CREATE GENERATOR gen_invoice_items_ID;
-SET GENERATOR gen_invoice_items_ID TO 0;
 
 CREATE TABLE Invoice_items (
-ID int NOT NULL PRIMARY KEY,
+Invoice_item_ID int NOT NULL PRIMARY KEY,
 Invoice_ID int NOT NULL,
 Product_name varchar(255) NOT NULL,
 Unit_price int NOT NULL CHECK (Unit_price>0),
 Amount float NOT NULL,
 Unit_of_measurement varchar(50) NOT NULL,
-Serial_number varchar(255) NOT NULL)
+Serial_number varchar(255) NOT NULL);
 
-CREATE GENERATOR gen_employyes_ID;
-SET GENERATOR gen_employyes_ID TO 0;
+
 
 CREATE TABLE Employees (
 Employee_ID int NOT NULL PRIMARY KEY, 
 Em_LOGIN varchar (50) NOT NULL,
 Job_title varchar(255) NOT NULL,
 Em_Name varchar(255) NOT NULL,
-Surname varchar(255) NOT NULL)
+Surname varchar(255) NOT NULL);
 
-CREATE GENERATOR gen_customers_ID;
-SET gen_customers_ID TO 0;
+
+
 
 CREATE TABLE Customers (
 Customer_ID int NOT NULL PRIMARY KEY,
@@ -63,63 +58,75 @@ Postal_code varchar(50),
 Telephone varchar(50),
 Email varchar(255),
 WWW varchar(255),
-Cus_Type varchar(50))
+Cus_Type varchar(50));
 
 
 CREATE TABLE Cus_Types (
 Cus_Type varchar(50) NOT NULL, 
-Discount int DEFAULT 0 CHECK (Discount >= 0))
+Discount int DEFAULT 0 CHECK (Discount >= 0));
 
 -- delete ID column from Products table. Set pirmary key to Product_name
 
 CREATE TABLE Products (
-ID int NOT NULL PRIMARY KEY,
-Product_name varchar(255) NOT NULL UNIQUE,
+Product_name varchar(255) NOT NULL Primary KEY,
 Brewery varchar(255) NOT NULL, 
 Distributor varchar(255),
 Price int NOT NULL,
 P_type varchar(50) NOT NULL,
 Amount int CHECK (Amount>=0),
-Unit_of_measurement varchar(50) NOT NULL)
+Unit_of_measurement varchar(50) NOT NULL);
+
 
 
 CREATE TABLE Products_Types (
-ID int NOT NULL PRIMARY KEY,
-P_Type_Name varchar(50) NOT NULL UNIQUE)
+Product_type_ID int NOT NULL PRIMARY KEY,
+P_Type_Name varchar(50) NOT NULL UNIQUE);
 
 
 CREATE TABLE Expiration_dates(
-ID int NOT NULL PRIMARY KEY,
 Product_name varchar(255) NOT NULL,
-Serial_number varchar(255) NOT NULL,
-Expiration_date timestamp NOT NULL)
+Serial_number varchar(255) PRIMARY KEY,
+Expiration_date timestamp NOT NULL);
 
-
+--DELETE ID colmn
 CREATE TABLE Distributors (
-ID int NOT NULL PRIMARY KEY,
-Dis_name varchar(255) NOT NULL UNIQUE,
+Dis_name varchar(255) NOT NULL PRIMARY KEY,
 Dis_Location varchar(255) NOT NULL,
 Adress varchar (255) NOT NULL,
 Postal_code varchar(50) NOT NULL,
 Telephone varchar (50) NOT NULL,
 Email varchar(255) NOT NULL,
-WWW varchar(255) NOT NULL)
+WWW varchar(255) NOT NULL);
 
-
+-- delete ID column
 CREATE TABLE Breweries (
-ID int NOT NULL PRIMARY KEY,
-Br_name varchar(255) NOT NULL UNIQUE,
+Br_name varchar(255) NOT NULL PRIMARY KEY,
 Br_Location varchar(255) NOT NULL,
 Adress varchar (255) NOT NULL,
 Postal_code varchar(50) NOT NULL,
 Telephone varchar(50) NOT NULL,
 Email varchar(255) NOT NULL,
-WWW varchar(255) NOT NULL)
+WWW varchar(255) NOT NULL);
 
 -- Creating generators
 
 CREATE GENERATOR gen_sale_id;
 SET GENERATOR gen_sale_id TO 0;
+
+CREATE GENERATOR gen_invoice_headers_ID;
+SET GENERATOR gen_invoice_headers_ID TO 0;
+
+CREATE GENERATOR gen_products_types_ID;
+SET GENERATOR gen_products_types_ID TO 0;
+
+CREATE GENERATOR gen_customers_ID;
+SET gen_customers_ID TO 0;
+
+CREATE GENERATOR gen_employyes_ID;
+SET GENERATOR gen_employyes_ID TO 0;
+
+CREATE GENERATOR gen_invoice_items_ID;
+SET GENERATOR gen_invoice_items_ID TO 0;
 
 -- Creating triggers
 
@@ -130,8 +137,42 @@ ACTIVE BEFORE INSERT POSITION 0
 AS
 BEGIN
 IF (NEW.Sale_ID IS NULL) THEN NEW.Sale_ID = GEN_ID(gen_sale_id, 1);
-END
+END !!
 
+CREATE TRIGGER TR_invoice_headers_ID FOR Invoice_headers
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Invoice_ID IS NULL) THEN NEW.Invoice_ID = GEN_ID(gen_invoice_headers_ID, 1);
+END !!
+
+CREATE TRIGGER TR_products_types_ID FOR Products_Types
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Product_type_ID IS NULL) THEN NEW.Product_type_ID = GEN_ID(gen_products_types_ID, 1);
+END !!
+
+CREATE TRIGGER TR_customers_ID FOR Customers
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Customer_ID IS NULL) THEN NEW.Customer_ID = GEN_ID(gen_customers_ID, 1);
+END !!
+
+CREATE TRIGGER TR_employees_ID FOR Employees
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Employee_ID IS NULL) THEN NEW.Employee_ID = GEN_ID(gen_employyes_ID, 1);
+END !!
+
+CREATE TRIGGER TR_invoice_items_ID FOR Invoice_items
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+IF (NEW.Invoice_item_ID IS NULL) THEN NEW.Invoice_item_ID = GEN_ID(gen_invoice_items_ID, 1);
+END !!
 
 SET TERM ;!!
 
