@@ -15,7 +15,8 @@ Sale_ID int NOT NULL PRIMARY KEY,
 Employee_ID int NOT NULL,
 Customer_name varchar(255) NOT NULL,
 Invoice_ID int NOT NULL,
-Sale_date date);
+Sale_date date,
+Operation_status int);
 
 
 CREATE TABLE Invoice_headers (
@@ -47,10 +48,8 @@ Surname varchar(255) NOT NULL);
 
 
 
-
 CREATE TABLE Customers (
-Customer_ID int NOT NULL PRIMARY KEY,
-Customer_name varchar(255) UNIQUE,
+Customer_name varchar(255) PRIMARY KEY,
 NIP varchar(20) UNIQUE,
 City varchar(255),
 C_Address varchar(255),
@@ -65,7 +64,6 @@ CREATE TABLE Cus_Types (
 Cus_Type varchar(50) NOT NULL, 
 Discount int DEFAULT 0 CHECK (Discount >= 0));
 
--- delete ID column from Products table. Set pirmary key to Product_name
 
 CREATE TABLE Products (
 Product_name varchar(255) NOT NULL Primary KEY,
@@ -75,7 +73,6 @@ Price int NOT NULL,
 P_type varchar(50) NOT NULL,
 Amount int CHECK (Amount>=0),
 Unit_of_measurement varchar(50) NOT NULL);
-
 
 
 CREATE TABLE Products_Types (
@@ -88,7 +85,7 @@ Product_name varchar(255) NOT NULL,
 Serial_number varchar(255) PRIMARY KEY,
 Expiration_date timestamp NOT NULL);
 
---DELETE ID colmn
+
 CREATE TABLE Distributors (
 Dis_name varchar(255) NOT NULL PRIMARY KEY,
 Dis_Location varchar(255) NOT NULL,
@@ -98,7 +95,7 @@ Telephone varchar (50) NOT NULL,
 Email varchar(255) NOT NULL,
 WWW varchar(255) NOT NULL);
 
--- delete ID column
+
 CREATE TABLE Breweries (
 Br_name varchar(255) NOT NULL PRIMARY KEY,
 Br_Location varchar(255) NOT NULL,
@@ -177,6 +174,8 @@ END !!
 SET TERM ;!!
 
 /* This part is adding foreign keys */
+
+ALTER TABLE 
 
 ALTER TABLE [dbo].[Expiration_dates] WITH NOCHECK ADD CONSTRAINT [FK_Product_name] FOREIGN KEY ([Product_name])
 REFERENCES [dbo].[Products]([Product_name])
