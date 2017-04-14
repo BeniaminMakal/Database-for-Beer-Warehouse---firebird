@@ -1,5 +1,6 @@
 -- Create or connect to database
 
+
 CREATE DATABASE "E:\SQL\Test\Database_for_Beer_Warehouse.fdb" page_size 8192
 user 'sysdba' password 'masterkey'
 
@@ -15,13 +16,13 @@ Sale_ID int NOT NULL PRIMARY KEY,
 Employee_ID int NOT NULL,
 Customer_name varchar(255) NOT NULL,
 Invoice_ID int NOT NULL,
-Sale_date date,
-Operation_status int);
+Sale_date timestamp,
+Operation_status int default 0);
 
 
 CREATE TABLE Invoice_headers (
 Invoice_ID int NOT NULL PRIMARY KEY,
-Customer_ID int NOT NULL,
+Customer_name varchar(255) NOT NULL,
 Payment varchar(30) NOT NULL,
 Discount int,
 Invoice_datetime timestamp,
@@ -49,7 +50,8 @@ Surname varchar(255) NOT NULL);
 
 
 CREATE TABLE Customers (
-Customer_name varchar(255) PRIMARY KEY,
+Customer_ID int PRIMARY KEY,
+Customer_name varchar(255) UNIQUE,
 NIP varchar(20) UNIQUE,
 City varchar(255),
 C_Address varchar(255),
@@ -61,7 +63,7 @@ Cus_Type varchar(50));
 
 
 CREATE TABLE Cus_Types (
-Cus_Type varchar(50) NOT NULL, 
+Cus_Type varchar(50) NOT NULL PRIMARY KEY, 
 Discount int DEFAULT 0 CHECK (Discount >= 0));
 
 
@@ -171,69 +173,86 @@ BEGIN
 IF (NEW.Invoice_item_ID IS NULL) THEN NEW.Invoice_item_ID = GEN_ID(gen_invoice_items_ID, 1);
 END !!
 
+CREATE TRIGGER TR_GET_DATETIME_SALE FOR Sale
+AFTER INSERT
+AS
+BEGIN
+UPDATE Sale
+SET Sale_date = (select cast('NOW' as timestamp) from rdb$database)
+WHERE Sale_ID = (SELECT MAX(Sale_ID) FROM Sale);
+END
+!!
+
+CREATE TRIGGER TR_SET_OPERATION_STATUS FOR Sale
+AFTER INSERT
+AS
+BEGIN
+UPDATE Sale
+SET Operation_Status = 1
+WHERE Sale_ID = (SELECT MAX(Sale_ID) FROM Sale);
+END
+!!
+
+CREATE TRIGGER TR_GET_DATETIME_INVOICE_HEADERS FOR Invoice_headers
+AFTER INSERT
+AS
+BEGIN
+UPDATE Invoice_headers
+SET Invoice_datetime = (select cast('NOW' as timestamp) from rdb$database)
+WHERE Invoice_ID = (SELECT MAX(Invoice_ID) FROM Invoice_headers);
+END
+!!
+
 SET TERM ;!!
 
-/* This part is adding foreign keys */
 
-ALTER TABLE 
 
-ALTER TABLE [dbo].[Expiration_dates] WITH NOCHECK ADD CONSTRAINT [FK_Product_name] FOREIGN KEY ([Product_name])
-REFERENCES [dbo].[Products]([Product_name])
-GO
+-- This part is adding foreign keys
 
-ALTER TABLE [dbo].[Sale]  WITH NOCHECK ADD  CONSTRAINT [FK_Sale_Employee] FOREIGN KEY([Employee_ID])
-REFERENCES [dbo].[Employees] ([Employee_ID])
-ON DELETE CASCADE
-GO
 
-ALTER TABLE [dbo].[Sale]  WITH NOCHECK ADD  CONSTRAINT [FK_Sale_Invoice_Headers] FOREIGN KEY([Invoice_ID])
-REFERENCES [dbo].[Invoice_headers] ([Invoice_ID])
-ON DELETE CASCADE
-GO
+ALTER TABLE Expiration_dates  ADD CONSTRAINT FK_Product_name FOREIGN KEY (Product_name)
+REFERENCES Products(Product_name)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Sale]  WITH NOCHECK ADD  CONSTRAINT [FK_Sale_Customers] FOREIGN KEY([Customer_name])
-REFERENCES [dbo].[Customers] ([Customer_name])
-ON DELETE CASCADE
-GO
+ALTER TABLE Sale ADD  CONSTRAINT FK_Sale_Employee FOREIGN KEY(Employee_ID)
+REFERENCES Employees (Employee_ID)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Invoice_headers]  WITH NOCHECK ADD  CONSTRAINT [FK_Invoice_Headers_Customer] FOREIGN KEY([Customer_ID])
-REFERENCES [dbo].[Customers] ([Customer_ID])
-ON DELETE NO ACTION
-GO
+ALTER TABLE Sale  ADD  CONSTRAINT FK_Sale_Invoice_Headers FOREIGN KEY(Invoice_ID)
+REFERENCES Invoice_headers (Invoice_ID)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Invoice_items]  WITH NOCHECK ADD  CONSTRAINT [FK_Invoice_Headers_ID] FOREIGN KEY([Invoice_ID])
-REFERENCES [dbo].[Invoice_headers] ([Invoice_ID])
-ON DELETE CASCADE
-GO
+ALTER TABLE Sale ADD  CONSTRAINT FK_Sale_Customers FOREIGN KEY(Customer_name)
+REFERENCES Customers (Customer_name)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Invoice_items]  WITH NOCHECK ADD  CONSTRAINT [FK_Invoice_items_ID] FOREIGN KEY([Product_name])
-REFERENCES [dbo].[Products] ([Product_name])
-GO
+ALTER TABLE Invoice_headers ADD  CONSTRAINT FK_Invoice_Headers_Customer FOREIGN KEY(Customer_name)
+REFERENCES Customers (Customer_name)
+ON DELETE NO ACTION;
 
-ALTER TABLE [dbo].[Invoice_items]  WITH NOCHECK ADD  CONSTRAINT [FK_Invoice_items_Product_name] FOREIGN KEY([Product_name])
-REFERENCES [dbo].[Products] ([Product_name])
-ON DELETE CASCADE
-GO
+ALTER TABLE Invoice_items ADD  CONSTRAINT FK_Invoice_Headers_ID FOREIGN KEY(Invoice_ID)
+REFERENCES Invoice_headers (Invoice_ID)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Products]  WITH NOCHECK ADD  CONSTRAINT [FK_Products_P_type] FOREIGN KEY([P_type])
-REFERENCES [dbo].[Products_Types] ([P_Type_Name])
-ON DELETE CASCADE
-GO
+ALTER TABLE Invoice_items ADD  CONSTRAINT FK_Invoice_items_Product_name FOREIGN KEY(Product_name)
+REFERENCES Products (Product_name)
+ON DELETE NO ACTION;
 
-ALTER TABLE [dbo].[Products]  WITH NOCHECK ADD  CONSTRAINT [FK_Products_Distributor] FOREIGN KEY([Distributor])
-REFERENCES [dbo].[Distributors] ([Dis_name])
-ON DELETE CASCADE
-GO
+ALTER TABLE Products ADD  CONSTRAINT FK_Products_P_type FOREIGN KEY(P_type)
+REFERENCES Products_Types (P_Type_Name)
+ON DELETE NO ACTION;
 
-ALTER TABLE [dbo].[Products]  WITH NOCHECK ADD  CONSTRAINT [FK_Products_Brewery] FOREIGN KEY([Brewery])
-REFERENCES [dbo].[Breweries] ([Br_name])
-ON DELETE CASCADE
-GO
+ALTER TABLE Products ADD  CONSTRAINT FK_Products_Distributor FOREIGN KEY(Distributor)
+REFERENCES Distributors (Dis_name)
+ON DELETE CASCADE;
 
-ALTER TABLE [dbo].[Customers]  WITH NOCHECK ADD  CONSTRAINT [FK_Customers] FOREIGN KEY([Cus_Type])
-REFERENCES [dbo].[Cus_Types] ([Cus_Type])
-ON DELETE CASCADE
-GO
+ALTER TABLE Products ADD CONSTRAINT FK_Products_Brewery FOREIGN KEY(Brewery)
+REFERENCES Breweries (Br_name)
+ON DELETE CASCADE;
+
+ALTER TABLE Customers ADD  CONSTRAINT FK_Customers FOREIGN KEY(Cus_Type)
+REFERENCES Cus_Types (Cus_Type)
+ON DELETE CASCADE;
 
 
 /*Creating logins, users and grant them roles */
@@ -518,13 +537,13 @@ VALUES ('Ma³pka', '8889652121', 'Wroc³aw', 'ul. Hutnicza 2', '50-001', '85412565
 INSERT INTO Customers (Customer_name, NIP, City, C_Address, Postal_code, Telephone, Email, WWW, Cus_Type)
 VALUES ('Kropka', '6527896598', 'Wroc³aw', 'ul. Wiejska 74', '50-031', '745985125', 'kropka@beer.com', 'www.kropka.com', 'VIP')
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Date_time)
+INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
 VALUES (1, 1100, 'CASH', 10, '2017-02-23 11:11:21')
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Date_time)
+INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
 VALUES (2, 1800, 'CREDIT CARD', 5, '2017-01-01 16:00:22')
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Date_time)
+INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
 VALUES (3, 10000, 'TRANSFER', 5, '2017-01-13 07:57:04')
 
 INSERT INTO Invoice_items (Product_name, Invoice_ID, Amount, Unit_price, Unit_of_measurement, Serial_number)
