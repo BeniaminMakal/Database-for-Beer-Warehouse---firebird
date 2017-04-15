@@ -255,155 +255,17 @@ REFERENCES Cus_Types (Cus_Type)
 ON DELETE CASCADE;
 
 
-/*Creating logins, users and grant them roles */
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier1')
-BEGIN 
-CREATE LOGIN cashier1 WITH PASSWORD = 'cashier1'
-END
-CREATE USER cashier1 FOR LOGIN cashier1
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier2')
-BEGIN 
-CREATE LOGIN cashier2 WITH PASSWORD = 'cashier2'
-END
-CREATE USER cashier2 FOR LOGIN cashier2
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier3')
-BEGIN 
-CREATE LOGIN cashier3 WITH PASSWORD = 'cashier3'
-END
-CREATE USER cashier3 FOR LOGIN cashier3
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier4')
-BEGIN 
-CREATE LOGIN cashier4 WITH PASSWORD = 'cashier4'
-END
-CREATE USER cashier4 FOR LOGIN cashier4
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier5')
-BEGIN 
-CREATE LOGIN cashier5 WITH PASSWORD = 'cashier5'
-END
-CREATE USER cashier5 FOR LOGIN cashier5
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier6')
-BEGIN 
-CREATE LOGIN cashier6 WITH PASSWORD = 'cashier6'
-END
-CREATE USER cashier6 FOR LOGIN cashier6
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'cashier7')
-BEGIN 
-CREATE LOGIN cashier7 WITH PASSWORD = 'cashier7'
-END
-CREATE USER cashier7 FOR LOGIN cashier7
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'warehouseman1')
-BEGIN 
-CREATE LOGIN warehouseman1 WITH PASSWORD = 'warehouseman1'
-END
-CREATE USER warehouseman1 FOR LOGIN warehouseman1
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'warehouseman2')
-BEGIN 
-CREATE LOGIN warehouseman2 WITH PASSWORD = 'warehouseman2'
-END
-CREATE USER warehouseman2 FOR LOGIN warehouseman2
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'boss')
-BEGIN 
-CREATE LOGIN boss WITH PASSWORD = 'boss'
-END
-CREATE USER boss FOR LOGIN boss
-GO
-
-IF NOT EXISTS (SELECT name FROM sys.sql_logins WHERE name = 'w_admin')
-BEGIN 
-CREATE LOGIN w_admin WITH PASSWORD = 'admin'
-END
-CREATE USER w_admin FOR LOGIN w_admin
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier1
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier1
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier2
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier2
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier3
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier3
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier4
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier4
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier5
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier5
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier6
-GO 
-ALTER ROLE db_datareader ADD MEMBER cashier6
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER cashier7
-GO
-ALTER ROLE db_datareader ADD MEMBER cashier7
-GO 
-
-ALTER ROLE db_datawriter ADD MEMBER warehouseman1
-GO 
-ALTER ROLE db_datareader ADD MEMBER warehouseman1
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER warehouseman2
-GO 
-ALTER ROLE db_datareader ADD MEMBER warehouseman2
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER boss
-GO 
-ALTER ROLE db_datareader ADD MEMBER boss
-GO
-ALTER ROLE db_securityadmin ADD MEMBER boss
-GO
-ALTER ROLE db_accessadmin ADD MEMBER boss
-GO
-
-ALTER ROLE db_datawriter ADD MEMBER w_admin
-GO 
-ALTER ROLE db_datareader ADD MEMBER w_admin
-GO
-ALTER ROLE db_securityadmin ADD MEMBER w_admin
-GO
-ALTER ROLE db_accessadmin ADD MEMBER w_admin
-GO
-ALTER ROLE db_backupoperator ADD MEMBER w_admin
-GO
-ALTER ROLE db_ddladmin ADD MEMBER w_admin
-GO
-ALTER ROLE db_owner ADD MEMBER w_admin
+-- Creating logins, users and grant them roles 
 
 
-/*Example content for database*/
+
+CREATE ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Products TO ROLE cashier;
+-- dodaæ u¿ytkowników po ich imionach
+-- dodaæ role: warehouseman i boss
+
+
+--Example content for database
 
 INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
 VALUES ('cashier', 'cashier1', 'John', 'Walker')
