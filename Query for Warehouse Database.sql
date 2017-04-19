@@ -258,9 +258,39 @@ ON DELETE CASCADE;
 -- Creating logins, users and grant them roles 
 
 
-
 CREATE ROLE cashier;
 GRANT SELECT, UPDATE, INSERT ON Products TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Sale TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Invoice_headers TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Invoice_items TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Customers TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Breweries TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Distributors TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Expiration_dates TO ROLE cashier;
+GRANT SELECT, UPDATE, INSERT ON Products_Types TO ROLE cashier;
+
+CREATE ROLE warehouseman;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Products TO ROLE warehouseman;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Products_Types TO ROLE warehouseman;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Expiration_dates TO ROLE warehouseman;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Breweries TO ROLE warehouseman;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Distributors TO ROLE warehouseman;
+
+CREATE ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Products TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Sale TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Invoice_headers TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Invoice_items TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Customers TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Cus_Types TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Breweries TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Distributors TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Expiration_dates TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Products_Types TO ROLE w_admin;
+GRANT SELECT, UPDATE, INSERT, DELETE ON Employees TO ROLE w_admin;
+
+-- granty na specjalne tabele
+
 -- dodaæ u¿ytkowników po ich imionach
 -- dodaæ role: warehouseman i boss
 
