@@ -30,7 +30,7 @@ Invoice_value float NOT NULL);
 
 
 CREATE TABLE Invoice_items (
-Invoice_item_ID int NOT NULL PRIMARY KEY,
+Invoice_items_ID int NOT NULL PRIMARY KEY,
 Invoice_ID int NOT NULL,
 Product_name varchar(255) NOT NULL,
 Unit_price int NOT NULL CHECK (Unit_price>0),
@@ -45,7 +45,7 @@ Employee_ID int NOT NULL PRIMARY KEY,
 Em_LOGIN varchar (50) NOT NULL,
 Job_title varchar(255) NOT NULL,
 Em_Name varchar(255) NOT NULL,
-Surname varchar(255) NOT NULL);
+Em_Surname varchar(255) NOT NULL);
 
 
 
@@ -170,7 +170,7 @@ CREATE TRIGGER TR_invoice_items_ID FOR Invoice_items
 ACTIVE BEFORE INSERT POSITION 0
 AS
 BEGIN
-IF (NEW.Invoice_item_ID IS NULL) THEN NEW.Invoice_item_ID = GEN_ID(gen_invoice_items_ID, 1);
+IF (NEW.Invoice_items_ID IS NULL) THEN NEW.Invoice_items_ID = GEN_ID(gen_invoice_items_ID, 1);
 END !!
 
 CREATE TRIGGER TR_GET_DATETIME_SALE FOR Sale
@@ -289,6 +289,23 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON Expiration_dates TO ROLE w_admin;
 GRANT SELECT, UPDATE, INSERT, DELETE ON Products_Types TO ROLE w_admin;
 GRANT SELECT, UPDATE, INSERT, DELETE ON Employees TO ROLE w_admin;
 
+CREATE USER cashier1 PASSWORD 'cashier1' FIRSTNAME 'John' LASTNAME 'Walker';
+GRANT cashier to cashier1;
+
+CREATE USER cashier2 PASSWORD 'cashier2' FIRSTNAME 'Juan' LASTNAME 'Moore';
+GRANT cashier to cashier2;
+
+CREATE USER cashier3 PASSWORD 'cashier3' FIRSTNAME 'Richard' LASTNAME 'Perez';
+GRANT cashier to cashier3;
+
+CREATE USER warehouseman1 PASSWORD 'warehouseman1' FIRSTNAME 'Jeremy' LASTNAME 'Mitchell';
+GRANT warehouseman to warehouseman1;
+
+CREATE USER warehouseman2 PASSWORD 'warehouseman2' FIRSTNAME 'David' LASTNAME 'Scott';
+GRANT warehouseman to warehouseman2;
+
+CREATE USER boss PASSWORD 'boss1' FIRSTNAME 'Peter' LASTNAME 'Anderson' GRANT ADMIN ROLE;
+GRANT w_admin to boss;
 -- granty na specjalne tabele
 
 -- dodaæ u¿ytkowników po ich imionach
@@ -297,158 +314,146 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON Employees TO ROLE w_admin;
 
 --Example content for database
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier1', 'John', 'Walker')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('cashier1', 'cashier', 'John', 'Walker');
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier2', 'Juan', 'Moore')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('cashier2', 'cashier', 'Juan', 'Moore');
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier3', 'Richard', 'Perez')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('cashier3', 'cashier', 'Richard', 'Perez');
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier4', 'Dennis', 'Wood')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('warehouseman1', 'warehouseman', 'Jeremy', 'Mitchell');
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier5', 'Paul', 'Collins')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('warehouseman2', 'warehouseman', 'David', 'Scott');
 
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier6', 'Christopher', 'Edwards')
-
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('cashier', 'cashier7', 'Jason', 'Stewart')
-
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('warehouseman', 'warehouseman1', 'Jeremy', 'Mitchell')
-
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('warehouseman', 'warehouseman2', 'David', 'Scott')
-
-INSERT INTO Employees (Position, Em_LOGIN, Em_Name, Surname)
-VALUES ('boss', 'boss', 'Peter', 'Anderson')
+INSERT INTO Employees (Em_LOGIN, Job_title, Em_Name, Em_Surname)
+VALUES ('boss', 'boss', 'Peter', 'Anderson');
 
 INSERT INTO Products_Types (P_Type_Name)
-VALUES ('Lager')
+VALUES ('Lager');
 
 INSERT INTO Products_Types (P_Type_Name)
-VALUES ('Porter')
+VALUES ('Porter');
 
 INSERT INTO Products_Types (P_Type_Name)
-VALUES ('Wheat beer')
+VALUES ('Wheat beer');
 
 INSERT INTO Products_Types (P_Type_Name)
-VALUES ('Stout')
+VALUES ('Stout');
 
 INSERT INTO Products_Types (P_Type_Name)
-VALUES ('RIS')
+VALUES ('RIS');
 
 INSERT INTO Distributors (Dis_name, Dis_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('We love beer', 'Sosnowiec', 'ul. Zielona 2', '15-232', '123456789', 'we_love_beer@beer.pl', 'www.welovebeer.pl')
+VALUES ('We love beer', 'Sosnowiec', 'ul. Zielona 2', '15-232', '123456789', 'we_love_beer@beer.pl', 'www.welovebeer.pl');
 
 INSERT INTO Distributors (Dis_name, Dis_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('Beer masters', 'Wroc³aw', 'ul. Czerwona 99', '50-531', '321654987', 'beer_masters@beer.pl', 'www.beermasters.pl')
+VALUES ('Beer masters', 'Wroc³aw', 'ul. Czerwona 99', '50-531', '321654987', 'beer_masters@beer.pl', 'www.beermasters.pl');
 
 INSERT INTO Distributors (Dis_name, Dis_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('Darkest beers', 'Kraków', 'ul. Niebieska 745', '15-232', '741852963', 'darkest_beers@beer.pl', 'www.darkestbeers.pl')
+VALUES ('Darkest beers', 'Kraków', 'ul. Niebieska 745', '15-232', '741852963', 'darkest_beers@beer.pl', 'www.darkestbeers.pl');
 
 INSERT INTO Breweries (Br_name, Br_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('Hops', 'Wroc³aw', 'ul. Ciemna 12', '50-634', '123654897', 'hops@beer.pl', 'www.hops.pl')
+VALUES ('Hops', 'Wroc³aw', 'ul. Ciemna 12', '50-634', '123654897', 'hops@beer.pl', 'www.hops.pl');
 
 INSERT INTO Breweries (Br_name, Br_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('For The Sun', 'Kostom³oty', 'ul. Sucha 2', '80-532', '365854795', 'For_The_Sun@beer.pl', 'www.forthesun.pl')
+VALUES ('For The Sun', 'Kostom³oty', 'ul. Sucha 2', '80-532', '365854795', 'For_The_Sun@beer.pl', 'www.forthesun.pl');
 
 INSERT INTO Breweries (Br_name, Br_Location, Adress, Postal_code, Telephone, Email, WWW)
-VALUES ('Green_Hops', 'Ko³o', 'ul. Mokra 64', '70-564', '123654897', 'green_hops@beer.pl', 'www.greenhops.pl')
+VALUES ('Green_Hops', 'Ko³o', 'ul. Mokra 64', '70-564', '123654897', 'green_hops@beer.pl', 'www.greenhops.pl');
 
 INSERT INTO Products (Product_name, Brewery, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Kazimierskie', 'For The Sun', 9, 'Lager', 100020, '0.5l')
+VALUES ('Kazimierskie', 'For The Sun', 9, 'Lager', 100020, '0.5l');
 
 INSERT INTO Products (Product_name, Brewery, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Wroc³awskie', 'For The Sun', 12, 'Porter', 4340, '0.5l')
+VALUES ('Wroc³awskie', 'For The Sun', 12, 'Porter', 4340, '0.5l');
 
 INSERT INTO Products (Product_name, Brewery, Distributor, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Hip-Hops', 'Hops', 'We love beer', 10, 'Wheat beer', 7890, '0.5l')
+VALUES ('Hip-Hops', 'Hops', 'We love beer', 10, 'Wheat beer', 7890, '0.5l');
 
 INSERT INTO Products (Product_name, Brewery, Distributor, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Dark Hoops', 'Hops', 'We love beer', 9, 'Porter', 5000, '0.5l')
+VALUES ('Dark Hoops', 'Hops', 'We love beer', 9, 'Porter', 5000, '0.5l');
 
 INSERT INTO Products (Product_name, Brewery, Distributor, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Black Leaf', 'Green_Hops', 'Beer masters', 22, 'RIS', 3900, '0.3l')
+VALUES ('Black Leaf', 'Green_Hops', 'Beer masters', 22, 'RIS', 3900, '0.3l');
 
 INSERT INTO Products (Product_name, Brewery, Distributor, Price, P_type, Amount, Unit_of_measurement)
-VALUES ('Coin', 'Green_Hops', 'Beer masters', 11, 'Stout', 6920, '0.5l')
+VALUES ('Coin', 'Green_Hops', 'Beer masters', 11, 'Stout', 6920, '0.5l');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Kazimierskie', '2016/08/12/T23', '2017-05-02 11:11:11')
+VALUES ( 'Kazimierskie', '2016/08/12/T23', '2017-05-02 11:11:11');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Wroc³awskie', '2016/11/21/T43', '2017-10-12 20:11:11')
+VALUES ( 'Wroc³awskie', '2016/11/21/T43', '2017-10-12 20:11:11');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Hip-Hops', '2016/12/01/R213', '2017-02-12 19:20:00')
+VALUES ( 'Hip-Hops', '2016/12/01/R213', '2017-02-12 19:20:00');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Hip-Hops', '2016/12/02/R214', '2017-02-12 20:20:00')
+VALUES ( 'Hip-Hops', '2016/12/02/R214', '2017-02-12 20:20:00');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Hip-Hops', '2016/12/03/R215', '2017-02-12 12:50:01')
+VALUES ( 'Hip-Hops', '2016/12/03/R215', '2017-02-12 12:50:01');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Dark Hoops', '2016/10/11/S32', '2017-04-05 07:31:12')
+VALUES ( 'Dark Hoops', '2016/10/11/S32', '2017-04-05 07:31:12');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Dark Hoops', '2016/10/12/S33', '2017-04-06 08:10:45')
+VALUES ( 'Dark Hoops', '2016/10/12/S33', '2017-04-06 08:10:45');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Black Leaf', '2016/12/12/W31', '2017-06-12 11:11:01')
+VALUES ( 'Black Leaf', '2016/12/12/W31', '2017-06-12 11:11:01');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Coin', '2016/12/12/8213', '2017-07-14 09:43:21')
+VALUES ( 'Coin', '2016/12/12/8213', '2017-07-14 09:43:21');
 
 INSERT INTO Expiration_dates (Product_name, Serial_number, Expiration_date)
-VALUES ( 'Coin', '2016/12/13/8214', '2017-07-15 19:13:21')
+VALUES ( 'Coin', '2016/12/13/8214', '2017-07-15 19:13:21');
 
 INSERT INTO Cus_Types (Cus_Type, Discount)
-VALUES ('DETAL', 0)
+VALUES ('DETAL', 0);
 
 INSERT INTO Cus_Types (Cus_Type, Discount)
-VALUES ('HURT', 5)
+VALUES ('HURT', 5);
 
 INSERT INTO Cus_Types (Cus_Type, Discount)
-VALUES ('VIP', 10)
+VALUES ('VIP', 10);
 
 INSERT INTO Customers (Customer_name, NIP, City, C_Address, Postal_code, Telephone, Email, WWW, Cus_Type)
-VALUES ('GRAF', '8992683494', 'Wroc³aw', 'ul. Gajowa 22', '50-289', '745896523', 'graf@beer.com', 'www.graf.com', 'VIP')
+VALUES ('GRAF', '8992683494', 'Wroc³aw', 'ul. Gajowa 22', '50-289', '745896523', 'graf@beer.com', 'www.graf.com', 'VIP');
 
 INSERT INTO Customers (Customer_name, NIP, City, C_Address, Postal_code, Telephone, Email, WWW, Cus_Type)
-VALUES ('Semafor', '8997849878', 'Oleœnica', 'ul. Cebulowa 16', '40-239', '741852965', 'semafor@beer.com', 'www.semafor.com', 'HURT')
+VALUES ('Semafor', '8997849878', 'Oleœnica', 'ul. Cebulowa 16', '40-239', '741852965', 'semafor@beer.com', 'www.semafor.com', 'HURT');
 
 INSERT INTO Customers (Customer_name, NIP, City, C_Address, Postal_code, Telephone, Email, WWW, Cus_Type)
-VALUES ('Ma³pka', '8889652121', 'Wroc³aw', 'ul. Hutnicza 2', '50-001', '854125652', 'malpka@beer.com', 'www.malpka.com', 'HURT')
+VALUES ('Ma³pka', '8889652121', 'Wroc³aw', 'ul. Hutnicza 2', '50-001', '854125652', 'malpka@beer.com', 'www.malpka.com', 'HURT');
 
 INSERT INTO Customers (Customer_name, NIP, City, C_Address, Postal_code, Telephone, Email, WWW, Cus_Type)
-VALUES ('Kropka', '6527896598', 'Wroc³aw', 'ul. Wiejska 74', '50-031', '745985125', 'kropka@beer.com', 'www.kropka.com', 'VIP')
+VALUES ('Kropka', '6527896598', 'Wroc³aw', 'ul. Wiejska 74', '50-031', '745985125', 'kropka@beer.com', 'www.kropka.com', 'VIP');
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
-VALUES (1, 1100, 'CASH', 10, '2017-02-23 11:11:21')
+INSERT INTO Invoice_headers (Customer_name, Payment, Discount, Invoice_datetime, Invoice_value)
+VALUES ('GRAF', 'CASH', 10, '2017-02-23 11:11:21', 1100);
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
-VALUES (2, 1800, 'CREDIT CARD', 5, '2017-01-01 16:00:22')
+INSERT INTO Invoice_headers (Customer_name, Payment, Discount, Invoice_datetime, Invoice_value)
+VALUES ('Semafor', 'CREDIT CARD', 5, '2017-01-01 16:00:22', 1800);
 
-INSERT INTO Invoice_headers (Customer_ID, Invoice_value, Payment, Discount, Invoice_datetime)
-VALUES (3, 10000, 'TRANSFER', 5, '2017-01-13 07:57:04')
+INSERT INTO Invoice_headers (Customer_name, Payment, Discount, Invoice_datetime, Invoice_value)
+VALUES ('Ma³pka', 'TRANSFER', 5, '2017-01-13 07:57:04', 10000);
 
-INSERT INTO Invoice_items (Product_name, Invoice_ID, Amount, Unit_price, Unit_of_measurement, Serial_number)
-VALUES ('Coin', 1, 100, 11, '0.5l', '2016/12/23/P09')
+INSERT INTO Invoice_items (Invoice_ID, Product_name, Unit_price, Amount, Unit_of_measurement, Serial_number)
+VALUES ( 1, 'Coin', 11, 100, '0.5l', '2016/12/23/P09');
 
-INSERT INTO Invoice_items (Product_name, Invoice_ID, Amount, Unit_price, Unit_of_measurement, Serial_number)
-VALUES ('Dark Hoops', 2, 200, 9, '0.3l', '2016/12/30/R423')
+INSERT INTO Invoice_items (Invoice_ID, Product_name, Unit_price, Amount, Unit_of_measurement, Serial_number)
+VALUES (2, 'Dark Hoops', 9, 200, '0.3l', '2016/12/30/R423');
 
-INSERT INTO Invoice_items (Product_name, Invoice_ID, Amount, Unit_price, Unit_of_measurement, Serial_number)
-VALUES ('Hip-Hops', 3, 1000, 10, '0.5l', '2017/01/23/G543')
+INSERT INTO Invoice_items (Invoice_ID, Product_name, Unit_price, Amount, Unit_of_measurement, Serial_number)
+VALUES (3, 'Hip-Hops', 10, 1000, '0.5l', '2017/01/23/G543');
 
 INSERT INTO SALE (Employee_ID, Customer_name, Invoice_ID, Sale_date)
-VALUES (1, 'GRAF', 1, '2017-02-23')
+VALUES (1, 'GRAF', 1, '2017-02-23');
 
 INSERT INTO SALE (Employee_ID, Customer_name, Invoice_ID, Sale_date)
 VALUES (2, 'Semafor', 2, '2017-01-01');
