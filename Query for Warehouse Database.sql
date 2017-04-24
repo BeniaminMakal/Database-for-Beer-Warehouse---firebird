@@ -26,7 +26,7 @@ Customer_name varchar(255) NOT NULL,
 Payment varchar(30) NOT NULL,
 Discount int,
 Invoice_datetime timestamp,
-Invoice_value float NOT NULL);
+Invoice_value DECIMAL(18, 4) NOT NULL);
 
 
 CREATE TABLE Invoice_items (
@@ -34,7 +34,7 @@ Invoice_items_ID int NOT NULL PRIMARY KEY,
 Invoice_ID int NOT NULL,
 Product_name varchar(255) NOT NULL,
 Unit_price int NOT NULL CHECK (Unit_price>0),
-Amount float NOT NULL,
+Amount numeric(9,2) NOT NULL,
 Unit_of_measurement varchar(50) NOT NULL,
 Serial_number varchar(255) NOT NULL);
 
